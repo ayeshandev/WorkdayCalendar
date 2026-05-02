@@ -38,6 +38,20 @@ namespace WorkdayCalendar
 
         public void SetRecurringHoliday(int month, int day)
         {
+            if (month < 1 || month > 12)
+                throw new ArgumentOutOfRangeException(nameof(month), "Month must be between 1 and 12.");
+
+            if (day < 1 || day > 31)
+                throw new ArgumentOutOfRangeException(nameof(day), "Day must be between 1 and 31.");
+
+            // February: disallow 29, 30, 31 because recurring holidays should be valid every year
+            if (month == 2 && day > 28)
+                throw new ArgumentException("February recurring holidays must be on or before the 28th (Feb 29 is not recurring every year).");
+
+            // Months with 30 days: April(4), June(6), September(9), November(11)
+            if ((month == 4 || month == 6 || month == 9 || month == 11) && day == 31)
+                throw new ArgumentException($"Month {month} does not have 31 days.");
+
             _holidays.Add(new RecurringHoliday(month, day));
         }
 
@@ -48,6 +62,9 @@ namespace WorkdayCalendar
 
         public void SetWorkdayStartAndEnd(TimeOnly start, TimeOnly end)
         {
+            if (start >= end)
+                throw new ArgumentException("Workday start must be earlier than end.");
+
             _workdayStart = start;
             _workdayEnd = end;
         }
