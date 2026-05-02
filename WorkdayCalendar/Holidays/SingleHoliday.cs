@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WorkdayCalendar.Holidays
+﻿namespace WorkdayCalendar.Holidays
 {
     public class SingleHoliday : IHoliday
     {
+        private readonly DateOnly _date;
+
+        public SingleHoliday(DateOnly date) 
+        {
+            _date = date;
+        }
+
         public bool IsHoliday(DateTime date)
         {
-            throw new NotImplementedException();
+            return DateOnly.FromDateTime(date).Equals(_date);
         }
     }
 }

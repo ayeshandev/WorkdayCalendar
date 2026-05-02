@@ -1,29 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using WorkdayCalendar.Holidays;
 
 namespace WorkdayCalendar
 {
     public class WorkdayCalendar : IWorkdayCalendar
     {
+        private readonly List<IHoliday> _holidays = new();
+        private TimeOnly _workdayStart = new TimeOnly(8, 0);
+        private TimeOnly _workdayEnd = new TimeOnly(16, 0);
+
         public DateTime GetWorkdayIncrement(DateTime date, decimal workdays)
         {
             throw new NotImplementedException();
         }
 
-        public void SetRecurringHoliday()
+        public void SetRecurringHoliday(int month, int day)
         {
-            throw new NotImplementedException();
+            _holidays.Add(new RecurringHoliday(month, day));
         }
 
-        public void SetSingleHoliday()
+        public void SetSingleHoliday(DateOnly date)
         {
-            throw new NotImplementedException();
+            _holidays.Add(new SingleHoliday(date));
         }
 
-        public void SetWorkdayStartAndEnd()
+        public void SetWorkdayStartAndEnd(TimeOnly start, TimeOnly end)
         {
-            throw new NotImplementedException();
+            _workdayStart = start;
+            _workdayEnd = end;
         }
     }
 }
