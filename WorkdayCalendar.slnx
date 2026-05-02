@@ -1,7 +1,5 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="Readme.md" />
-  </Folder>
+  <Folder Name="/Solution Items/" />
   <Project Path="WorkdayCalendar.Tests/WorkdayCalendar.Tests.csproj" />
   <Project Path="WorkdayCalendar/WorkdayCalendar.csproj" />
 </Solution>

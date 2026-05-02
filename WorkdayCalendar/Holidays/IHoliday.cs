@@ -2,6 +2,6 @@
 {
     public interface IHoliday
     {
-        bool IsHoliday(DateTime date);
+        bool IsHoliday(DateOnly date);
     }
 }

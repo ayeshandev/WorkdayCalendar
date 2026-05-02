@@ -11,7 +11,7 @@
             _day = day;
         }
 
-        public bool IsHoliday(DateTime date)
+        public bool IsHoliday(DateOnly date)
         {
             return date.Month == _month && date.Day == _day;    
         }

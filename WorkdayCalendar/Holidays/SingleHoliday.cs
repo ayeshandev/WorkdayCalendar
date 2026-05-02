@@ -9,9 +9,9 @@
             _date = date;
         }
 
-        public bool IsHoliday(DateTime date)
+        public bool IsHoliday(DateOnly date)
         {
-            return DateOnly.FromDateTime(date).Equals(_date);
+            return _date.Equals(date);
         }
     }
 }
