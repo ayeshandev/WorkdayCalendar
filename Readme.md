@@ -7,3 +7,4 @@ This project provides a simple way to calculate workdays, taking into account we
 ## Approach
 
 1) Initilal project setup with domain models and interfaces.
+2) Implement holiday management to add different types of holidays.
