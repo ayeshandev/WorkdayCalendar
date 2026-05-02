@@ -43,6 +43,24 @@
 
                 Assert.Equal(new DateTime(2004, 6, 4, 10, 12, 0), TruncateToMinute(result));
             }
+
+            [Fact]
+            public void NegativeIncrement_SkipsRecurringHoliday()
+            {
+                // 24-05-2004 18:05 + (−5.5) workdays = 14-05-2004 12:00
+                var result = _calendar.GetWorkdayIncrement(new DateTime(2004, 5, 24, 18, 5, 0), -5.5m);
+
+                Assert.Equal(new DateTime(2004, 5, 14, 12, 0, 0), TruncateToMinute(result));
+            }
+
+            [Fact]
+            public void NegativeIncrement_StartJustAfterWorkdayEnd()
+            {
+                // 24-05-2004 18:03 + (-6.7470217) workdays = 13-05-2004 10:02
+                var result = _calendar.GetWorkdayIncrement(new DateTime(2004, 5, 24, 18, 3, 0), -6.7470217m);
+
+                Assert.Equal(new DateTime(2004, 5, 13, 10, 2, 0), TruncateToMinute(result));
+            }
         }
     }
 }

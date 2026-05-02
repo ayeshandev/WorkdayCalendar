@@ -10,32 +10,30 @@ namespace WorkdayCalendar
 
         public DateTime GetWorkdayIncrement(DateTime date, decimal workdays)
         {
-            // Consider only forward increments for now, negative increments can be added later
-            var (effectiveDate, effectiveTime) = GetEffectiveDateTime(date);
+            if(workdays == 0)
+            {
+                return date;
+            }
 
-            var offsetMinutes = (effectiveTime - _workdayStart).TotalMinutes;
+            bool forwardIncrement = workdays > 0;
+            var (effectiveDate, effectiveTime) = GetEffectiveDateTime(date, forwardIncrement);
+
+            var offsetMinutes = GetOffsetMinutes(effectiveTime, forwardIncrement);
 
             var workdayMinutes = GetWorkdayMinutes();
 
-            var totalWorkdayMinutes = (double)workdays * workdayMinutes;
+            var totalWorkdayMinutes = Math.Abs((double)workdays * workdayMinutes);
 
             var totalMinutes = offsetMinutes + totalWorkdayMinutes;
 
             int totalFullWorkdays = (int)Math.Floor(totalMinutes / workdayMinutes);
-            var remainingMinutes = totalMinutes % workdayMinutes;
+            var remainingMinutes = (int)Math.Floor(totalMinutes % workdayMinutes);
 
-            int addedWorkdays = 0;
-            var incrementedDate = effectiveDate;
+            var finalDate = forwardIncrement ? GetIncrementedDate(effectiveDate, totalFullWorkdays) : GetDecrementedDate(effectiveDate, totalFullWorkdays);
 
-            while (addedWorkdays < totalFullWorkdays)
-            {
-                incrementedDate = NextWorkday(incrementedDate);
-                addedWorkdays++;
-            }
+            var finalDateTime = forwardIncrement ? _workdayStart.Add(TimeSpan.FromMinutes(remainingMinutes)) : _workdayEnd.Add(-1 * TimeSpan.FromMinutes(remainingMinutes));
 
-            var incrementedDateTime = _workdayStart.Add(TimeSpan.FromMinutes(remainingMinutes));
-
-            return incrementedDate.ToDateTime(incrementedDateTime);
+            return finalDate.ToDateTime(finalDateTime);
         }
 
         public void SetRecurringHoliday(int month, int day)
@@ -74,20 +72,42 @@ namespace WorkdayCalendar
             return (_workdayEnd - _workdayStart).TotalMinutes;
         }
 
-        private (DateOnly date, TimeOnly time) GetEffectiveDateTime(DateTime date)
+        private (DateOnly date, TimeOnly time) GetEffectiveDateTime(DateTime date, bool forwardIncrement)
         {
             var effectiveDate = DateOnly.FromDateTime(date);
             var effectiveTime = TimeOnly.FromDateTime(date);
-            if (effectiveTime < _workdayStart)
+
+            if (forwardIncrement)
             {
-                effectiveTime = _workdayStart;
+                if (effectiveTime < _workdayStart)
+                {
+                    effectiveTime = _workdayStart;
+                }
+                else if (effectiveTime > _workdayEnd)
+                {
+                    effectiveTime = _workdayStart;
+                    effectiveDate = effectiveDate.AddDays(1);
+                }
             }
-            else if (effectiveTime > _workdayEnd)
+            else
             {
-                effectiveTime = _workdayStart;
-                effectiveDate = effectiveDate.AddDays(1);
+                if (effectiveTime < _workdayStart)
+                {
+                    effectiveTime = _workdayEnd;
+                    effectiveDate = effectiveDate.AddDays(-1);
+                }
+                else if (effectiveTime > _workdayEnd)
+                {
+                    effectiveTime = _workdayEnd;
+                }
             }
+
             return (effectiveDate, effectiveTime);
+        }
+
+        private double GetOffsetMinutes(TimeOnly effectiveTime, bool forwardIncrement)
+        {
+            return forwardIncrement ? (effectiveTime - _workdayStart).TotalMinutes : (_workdayEnd - effectiveTime).TotalMinutes;
         }
 
         private DateOnly NextWorkday(DateOnly date)
@@ -98,6 +118,46 @@ namespace WorkdayCalendar
                 nextDate = nextDate.AddDays(1);
             }
             return nextDate;
+        }
+
+        private DateOnly PreviousWorkday(DateOnly date)
+        {
+            var previousDate = date.AddDays(-1);
+            while (!IsWorkday(previousDate))
+            {
+                previousDate = previousDate.AddDays(-1);
+            }
+            return previousDate;
+        }
+
+        private DateOnly GetIncrementedDate(DateOnly effectiveDate, int totalFullWorkdays)
+        {
+
+            int addedWorkdays = 0;
+            var incrementedDate = effectiveDate;
+
+            while (addedWorkdays < totalFullWorkdays)
+            {
+                incrementedDate = NextWorkday(incrementedDate);
+                addedWorkdays++;
+            }
+
+            return incrementedDate;
+        }
+
+        private DateOnly GetDecrementedDate(DateOnly effectiveDate, int totalFullWorkdays)
+        {
+
+            int deductedWorkdays = 0;
+            var decrementedDate = effectiveDate;
+
+            while (deductedWorkdays < totalFullWorkdays)
+            {
+                decrementedDate = PreviousWorkday(decrementedDate);
+                deductedWorkdays++;
+            }
+
+            return decrementedDate;
         }
     }
 }
