@@ -16,7 +16,7 @@ namespace WorkdayCalendar
             }
 
             bool forwardIncrement = workdays > 0;
-            var (effectiveDate, effectiveTime) = GetEffectiveDateTime(date, forwardIncrement);
+            var (effectiveDate, effectiveTime) = forwardIncrement ? GetForwardEffectiveDateTime(date) : GetBackwardEffectiveDateTime(date);
 
             var offsetMinutes = GetOffsetMinutes(effectiveTime, forwardIncrement);
 
@@ -94,29 +94,50 @@ namespace WorkdayCalendar
             var effectiveDate = DateOnly.FromDateTime(date);
             var effectiveTime = TimeOnly.FromDateTime(date);
 
-            if (forwardIncrement)
+            return forwardIncrement ? GetForwardEffectiveDateTime(date) : GetBackwardEffectiveDateTime(date);
+        }
+
+        private (DateOnly dateOnly, TimeOnly timeOnly) GetForwardEffectiveDateTime(DateTime date)
+        {
+            var effectiveDate = DateOnly.FromDateTime(date);
+            var effectiveTime = TimeOnly.FromDateTime(date);
+
+            if (!IsWorkday(effectiveDate))
             {
-                if (effectiveTime < _workdayStart)
-                {
-                    effectiveTime = _workdayStart;
-                }
-                else if (effectiveTime > _workdayEnd)
-                {
-                    effectiveTime = _workdayStart;
-                    effectiveDate = effectiveDate.AddDays(1);
-                }
+                effectiveDate = NextWorkday(effectiveDate);
+                effectiveTime = _workdayStart;
             }
-            else
+            else if (effectiveTime < _workdayStart)
             {
-                if (effectiveTime < _workdayStart)
-                {
-                    effectiveTime = _workdayEnd;
-                    effectiveDate = effectiveDate.AddDays(-1);
-                }
-                else if (effectiveTime > _workdayEnd)
-                {
-                    effectiveTime = _workdayEnd;
-                }
+                effectiveTime = _workdayStart;
+            }
+            else if (effectiveTime > _workdayEnd)
+            {
+                effectiveTime = _workdayStart;
+                effectiveDate = NextWorkday(effectiveDate);
+            }
+
+            return (effectiveDate, effectiveTime);
+        }
+
+        private (DateOnly dateOnly, TimeOnly timeOnly) GetBackwardEffectiveDateTime(DateTime date)
+        {
+            var effectiveDate = DateOnly.FromDateTime(date);
+            var effectiveTime = TimeOnly.FromDateTime(date);
+
+            if (!IsWorkday(effectiveDate))
+            {
+                effectiveDate = PreviousWorkday(effectiveDate);
+                effectiveTime = _workdayEnd;
+            }
+            else if (effectiveTime < _workdayStart)
+            {
+                effectiveTime = _workdayEnd;
+                effectiveDate = PreviousWorkday(effectiveDate);
+            }
+            else if (effectiveTime > _workdayEnd)
+            {
+                effectiveTime = _workdayEnd;
             }
 
             return (effectiveDate, effectiveTime);

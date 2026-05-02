@@ -239,10 +239,10 @@ public class WorkdayCalendarTests
         public void Backward_StartOnHoliday_NormalizesToPreviousWorkday()
         {
             // May 17 (holiday, Monday) at 10:00 backward → normalize to May 14 (Friday) at 16:00
-            // subtract 1 wd → 480 min offset + (−480) = 0 → May 14 08:00
+            // subtract 1 wd → May 13 16:00
             var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 17, 10, 0, 0), -1m);
 
-            Assert.Equal(new DateTime(2004, 5, 14, 8, 0, 0), TruncateToMinute(result));
+            Assert.Equal(new DateTime(2004, 5, 13, 16, 0, 0), TruncateToMinute(result));
         }
 
         [Fact]
