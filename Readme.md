@@ -90,10 +90,11 @@ WorkdayCalendar     : Main orchestrator (IWorkdayCalendar)
    - Final time = `End - remaining_minutes` (backward)
 
 **Example**: `24-05-2004 18:05 + (-5.5) workdays = 14-05-2004 12:00`
-- Input normalized to: 24-05-2004 (next workday) → 25-05-2004 08:00
-- Calculate: 5.5 days × 8 hours = 44 hours = 2,640 minutes
-- Move back 5 full workdays + 240 remaining minutes (4 hours)
-- Result: 14-05-2004 12:00 ✓
+- Input normalized (backward): 18:05 > 16:00 → snapped to 24-05-2004 16:00
+- Offset from end: 0 min; increment: 5.5 × 480 = 2,640 min total
+- Full workdays back: 5; remaining: 240 min (4 hours)
+- Move back 5 workdays from May 24, skipping May 17 (recurring holiday) → lands on May 14
+- Result: 16:00 − 4 h = 12:00 → 14-05-2004 12:00 ✓
 
 ### 4. **Testable Code Structure**
 - Private helper methods for unit testing key behaviors
