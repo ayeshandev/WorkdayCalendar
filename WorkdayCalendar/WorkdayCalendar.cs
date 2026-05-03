@@ -24,9 +24,7 @@ namespace WorkdayCalendar
             int fullWorkdays = (int)Math.Floor(totalMinutes / _workingHours.TotalMinutes);
             var remainingMinutes = (int)Math.Floor(totalMinutes % _workingHours.TotalMinutes);
 
-            var finalDate = forward
-                ? GetIncrementedDate(effectiveDate, fullWorkdays)
-                : GetDecrementedDate(effectiveDate, fullWorkdays);
+            var finalDate = MoveWorkingDays(effectiveDate, fullWorkdays, forward);
 
             var finalTime = forward
                 ? _workingHours.Start.Add(TimeSpan.FromMinutes(remainingMinutes))
@@ -113,18 +111,20 @@ namespace WorkdayCalendar
             return prev;
         }
 
-        private DateOnly GetIncrementedDate(DateOnly date, int count)
+        private DateOnly MoveWorkingDays(DateOnly date, int days, bool moveForward = true)
         {
-            for (int i = 0; i < count; i++)
-                date = NextWorkday(date);
-            return date;
-        }
+            var direction = moveForward ? 1 : -1;
+            int remainingDays = days;
+            var currentDate = date;
 
-        private DateOnly GetDecrementedDate(DateOnly date, int count)
-        {
-            for (int i = 0; i < count; i++)
-                date = PreviousWorkday(date);
-            return date;
+            while (remainingDays > 0) 
+            {
+                currentDate = currentDate.AddDays(direction);
+                if (IsWorkday(currentDate))
+                    remainingDays--;
+            }
+
+            return currentDate;
         }
     }
 }
