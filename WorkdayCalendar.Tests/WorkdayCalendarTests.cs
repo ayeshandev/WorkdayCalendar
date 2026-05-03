@@ -69,6 +69,15 @@ public class WorkdayCalendarTests
 
             Assert.Equal(new DateTime(2004, 6, 4, 10, 12, 0), TruncateToMinute(result));
         }
+
+        [Fact]
+        public void NegativeIncrement_StartAfterWorkdayEnd()
+        {
+            // 24-05-2004 18:03 + (-6.7470217) workdays = 13-05-2004 10:02
+            var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 24, 18, 3, 0), -6.7470217m);
+
+            Assert.Equal(new DateTime(2004, 5, 13, 10, 2, 0), TruncateToMinute(result));
+        }
     }
 
     // ── Zero increment ────────────────────────────────────────────────────────

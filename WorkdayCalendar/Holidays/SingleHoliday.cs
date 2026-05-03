@@ -1,17 +1,6 @@
-﻿namespace WorkdayCalendar.Holidays
+namespace WorkdayCalendar.Holidays;
+
+public record SingleHoliday(DateOnly Date) : IHoliday
 {
-    public class SingleHoliday : IHoliday
-    {
-        private readonly DateOnly _date;
-
-        public SingleHoliday(DateOnly date) 
-        {
-            _date = date;
-        }
-
-        public bool IsHoliday(DateOnly date)
-        {
-            return _date.Equals(date);
-        }
-    }
+    public bool IsHoliday(DateOnly date) => Date == date;
 }
