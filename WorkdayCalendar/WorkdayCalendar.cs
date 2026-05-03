@@ -9,10 +9,7 @@ namespace WorkdayCalendar
 
         public DateTime GetWorkdayIncrement(DateTime date, decimal workdays)
         {
-            if (workdays == 0)
-                return date;
-
-            bool forward = workdays > 0;
+            bool forward = workdays >= 0;
             var (effectiveDate, effectiveTime) = forward
                 ? GetForwardEffectiveDateTime(date)
                 : GetBackwardEffectiveDateTime(date);

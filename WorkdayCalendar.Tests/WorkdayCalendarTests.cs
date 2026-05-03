@@ -89,8 +89,37 @@ public class WorkdayCalendarTests
         [Fact]
         public void ZeroIncrement_ReturnsUnchangedDateTime()
         {
-            var start = new DateTime(2004, 5, 24, 10, 0, 0);
-            Assert.Equal(start, _cal.GetWorkdayIncrement(start, 0m));
+            // 24-05-2004 9:03 + 0 workdays = 24-05-2004 09:03
+            var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 24, 9, 3, 0), 0m);
+
+            Assert.Equal(new DateTime(2004, 5, 24, 9, 3, 0), TruncateToMinute(result));
+        }
+
+        [Fact]
+        public void ZeroIncrement_StartOnHoliday_ReturnsNextWorkingDateTime()
+        {
+            // 17-05-2004 9:03 + 0 workdays = 18-05-2004 08:00
+            var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 17, 9, 3, 0), 0m);
+
+            Assert.Equal(new DateTime(2004, 5, 18, 8, 0, 0), TruncateToMinute(result));
+        }
+
+        [Fact]
+        public void ZeroIncrement_StartBeforeWorkStart_ReturnsNextWorkingDateTime()
+        {
+            // 24-05-2004 7:03 + 0 workdays = 24-05-2004 08:00
+            var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 24, 7, 3, 0), 0m);
+
+            Assert.Equal(new DateTime(2004, 5, 24, 8, 0, 0), TruncateToMinute(result));
+        }
+
+        [Fact]
+        public void ZeroIncrement_StartAfterWorkEnd_ReturnsNextWorkingDateTime()
+        {
+            // 24-05-2004 17:03 + 0 workdays = 25-05-2004 08:00
+            var result = _cal.GetWorkdayIncrement(new DateTime(2004, 5, 24, 17, 3, 0), 0m);
+
+            Assert.Equal(new DateTime(2004, 5, 25, 8, 0, 0), TruncateToMinute(result));
         }
     }
 
